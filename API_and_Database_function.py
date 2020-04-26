@@ -4,7 +4,7 @@
 from sqlalchemy import Table, Column, String, Integer, Float, Boolean, Date, BigInteger
 from sqlalchemy import create_engine, MetaData
 
-from sqlalchemy import insert, select, delete
+from sqlalchemy import insert, select, delete, update
 import json 
 import tweepy
 import pandas as pd
@@ -305,6 +305,19 @@ def export_to_csv(The_Table_name, connection, CSV_name):
     df2.loc[:,'Manual_Sentiment_Annotation'] = df2.sum(numeric_only=True, axis=1)
     df2.loc[:,'User_of_the_annotation'] = df2.sum(numeric_only=True, axis=1)
     df2.to_csv(CSV_name, encoding = 'utf16', index = False, sep = ';')
+
+
+def update_annotations_db(The_Table_name, connection, Dataframe_from_CSV) :
+    Sentiment_df = pd.read_csv(Dataframe_from_CSV, encoding = 'UTF-16 LE',  sep = '\t')
+
+    for i in range(len(Sentiment_df['Tweets_ID'])) :
+        update_stmt = update(The_Table_name).values(Manual_Sentiment_Annotation= Sentiment_df['Manual_Sentiment_Annotation'][i])
+        update_stmt2 = update_stmt.where(The_Table_name.columns.Tweets_ID == int(Sentiment_df['Tweets_ID'][i][1:-1]))
+        update_results = connection.execute(update_stmt2)
+    
+        update_stmt_1 = update(The_Table_name).values(User_of_the_annotation= Sentiment_df['User_of_the_annotation'][i])
+        update_stmt_2 = update_stmt_1.where(The_Table_name.columns.Tweets_ID == int(Sentiment_df['Tweets_ID'][i][1:-1]))
+        update_results2 = connection.execute(update_stmt_2)
 
 
     
