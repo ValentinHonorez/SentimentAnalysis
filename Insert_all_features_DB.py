@@ -20,13 +20,12 @@ api = func.Tweepy_Access(ACCESS_TOKEN, ACCESS_SECRET, CONSUMER_KEY, CONSUMER_SEC
 
 
 
-search_words = "je"
+search_words = "#politique"
 date_since = "2018-11-16"
 language = "fr"
-number_items =  1
+number_items =  500
 tweets = func.Search_Tweets(api, search_words, date_since, language , number_items)
-connection, Twitter_Sentiment_Analysis = func.Database_Acces("mysql://root@localhost/sentimentanalysis", 'mbcs', "Twitter_Sentiment_Analysis")
-
+connection, Twitter_Sentiment_Analysis = func.Database_Acces("mysql://root@localhost/sentiment?charset=utf8mb4", 'utf8', "Twitter_Sentiment_Analysis4")
 
 
 
@@ -52,11 +51,11 @@ for tweet in tweets:
  
 
 
-    values_list.update({'Tweets_ID': tweet.id, 'Tweets_data': tweet.text.encode('mbcs'), 'Tweets_Date_of_creation': tweet.created_at, 'Retweet': re_tweet , 'Retweet_original_TweetID' : retweet_TweetID , 'Retweet_original_authorID': userID_retweet , 'Retweet_original_author_Name' : user_retweet, 'Retweet_original_author_Screen_Name' : user_Screen_retweet,
+    values_list.update({'Tweets_ID': tweet.id, 'Tweets_data': tweet.text.encode('utf8'), 'Tweets_Date_of_creation': tweet.created_at, 'Retweet': re_tweet , 'Retweet_original_TweetID' : retweet_TweetID , 'Retweet_original_authorID': userID_retweet , 'Retweet_original_author_Name' : user_retweet, 'Retweet_original_author_Screen_Name' : user_Screen_retweet,
 
 
           'Reply' : reply , 'Reply_original_authorID' : tweet.in_reply_to_user_id ,  'Reply_original_author_Screen_Name' : tweet.in_reply_to_screen_name , 
-    'User_ID' : tweet.user.id , 'USERNAME' : tweet.user.name.encode('mbcs'), 'SCREEN_NAME' : tweet.user.screen_name.encode('mbcs') , 'City_Name' : city , 'Country_Name' : country , 
+    'User_ID' : tweet.user.id , 'USERNAME' : tweet.user.name.encode('utf8'), 'SCREEN_NAME' : tweet.user.screen_name.encode('utf8') , 'City_Name' : city , 'Country_Name' : country , 
     'Language' : tweet.lang.encode('utf8') , 'Verified_account' : tweet.user.verified , 
     'Numbers_of_followers' : tweet.user.followers_count, 'Numbers_of_friends' : tweet.user.friends_count , 'User_mentions' : mention,
     'Hashtags' : Hashtag , 'Other_symbols' : symbols , 'Video' : video , 'Image' : image, 'URLS' : url} )

@@ -7,6 +7,9 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy import insert, select, delete
 import json 
 import tweepy
+import pandas as pd
+import re
+
 
 
 def Tweepy_Access(ACCESS_TOKEN, ACCESS_SECRET, CONSUMER_KEY, CONSUMER_SECRET) : 
@@ -261,6 +264,50 @@ def All_tweets_Delete(Name_Table, connection) :
     # Print affected rowcount
     print(results.rowcount)
 
+def export_to_csv(The_Table_name, connection, CSV_name):
+    """This function exports in csv from the database the Tweets Data and the Tweets ID. It also adds some columns to prepare the manual annotation.
+    
+    Args:
+        
+        The_Table_name <class 'sqlalchemy.sql.schema.Table'> :  variable attached to the table of the database
+        connection <class 'sqlalchemy.engine.base.Connection'> : will be used when you have to execute a statement to the database
+        CSV_name (str) : Name of the csv file you want to create
+    """
+    stmt = select([The_Table_name.columns.Tweets_data])
+    stmt2 = select([The_Table_name.columns.Tweets_ID])
+    final_result = []
+    final_result2 = []
+    for results in connection.execute(stmt).fetchall() :
+        results2 = list(results)
+        final_result.append(results2)
+
+    for results2 in connection.execute(stmt2).fetchall() :
+        final_result2.append(results2)        
+
+    zipped = list(zip(final_result2 , final_result))
+    df = pd.DataFrame(zipped)
+    list_labels = ['Tweets_ID', 'Tweets_data' ]
+    df.columns = list_labels
+    final2 = []
+    try :
+        for i in df['Tweets_data'] :
+            for j in i :
+                first = re.sub("[\r\n]+", " ", j)#remove the \n
+                final = re.sub(" +", " ", first)#replace all the spaces by only 1 space
+                final2.append(final)
+    except : 
+        pass
+
+    zipped = list(zip(final_result2 , final2))
+    df2 = pd.DataFrame(zipped)
+    list_labels = ['Tweets_ID', 'Tweets_data' ]
+    df2.columns = list_labels
+    df2.loc[:,'Manual_Sentiment_Annotation'] = df2.sum(numeric_only=True, axis=1)
+    df2.loc[:,'User_of_the_annotation'] = df2.sum(numeric_only=True, axis=1)
+    df2.to_csv(CSV_name, encoding = 'utf16', index = False, sep = ';')
+
 
     
+    
+
     

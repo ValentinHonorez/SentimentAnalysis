@@ -7,7 +7,8 @@ from sqlalchemy import create_engine, MetaData
 
 
 
-engine = create_engine("mysql://root@localhost/sentimentanalysis", echo = True, encoding = 'mbcs')
+engine = create_engine("mysql://root@localhost/sentiment?charset=utf8mb4", echo = True, encoding = 'utf8')
+
 
 metadata = MetaData()
 
@@ -15,11 +16,12 @@ connection = engine.connect()
 
 #create_str = "CREATE DATABASE IF NOT EXISTS sentimentanalysis ;"
 #engine.execute(create_str)
+"""
+stmt = "SET NAMES 'UTF8';"
+connection.execute(stmt)
+"""
 
-
-
-
-Twitter_Sentiment_Analysis = Table('Twitter_Sentiment_Analysis', metadata,
+Twitter_Sentiment_Analysis = Table('Twitter_Sentiment_Analysis2', metadata,
              Column('Database_ID', BigInteger), 
              Column('Tweets_ID', BigInteger),
              Column('Tweets_data', String(512)),
